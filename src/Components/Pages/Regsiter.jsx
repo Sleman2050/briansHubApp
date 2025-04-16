@@ -13,7 +13,10 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import ClipLoader from "react-spinners/ClipLoader";
 import { AuthContext } from "../AppContext/AppContext";
-import { auth, onAuthStateChanged } from "../firebase/firebase";
+import { auth, onAuthStateChanged, db } from "../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
+// In your main file (e.g., index.js or App.js)
+import "../../index.css";
 
 const Regsiter = () => {
   const [loading, setLoading] = useState(false);
@@ -23,9 +26,20 @@ const Regsiter = () => {
 
   useEffect(() => {
     setLoading(true);
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        navigate("/");
+        // Fetch user role from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+
+        // Navigate based on role
+        if (userData?.role === "advisor") {
+          navigate("/home");
+        } else if (userData?.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
         setLoading(false);
       } else {
         setLoading(false);
@@ -37,11 +51,13 @@ const Regsiter = () => {
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .required("Required")
+      .required("Name is required")
       .min(4, "Must be at least 4 characters long"),
-    email: Yup.string().email("Invalid email address").required("Required"),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
     password: Yup.string()
-      .required("Required")
+      .required("Password is required")
       .min(6, "Must be at least 6 characters long"),
   });
 
@@ -62,89 +78,120 @@ const Regsiter = () => {
   return (
     <>
       {loading ? (
-        <div className="grid grid-cols-1 justify-items-center items-center h-screen">
+        <div className="grid grid-cols-1 justify-items-center items-center min-h-screen bg-gray-50">
           <ClipLoader color="#367fd6" size={150} speedMultiplier={0.5} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 justify-items-center items-center h-screen">
-          <Card className="w-96">
+        <div className="grid grid-cols-1 justify-items-center items-center min-h-screen bg-gray-50">
+          <Card className="w-96 shadow-xl rounded-lg">
             <CardHeader
               variant="gradient"
-              color="blue"
-              className="mb-4 grid h-28 place-items-center"
+              color="teal"
+              className="mb-4 grid h-24 place-items-center rounded-t-lg"
             >
-              <Typography variant="h3" color="white">
-                REGISTER
+              <Typography variant="h4" color="white" className="tracking-wider uppercase">
+                Register
               </Typography>
             </CardHeader>
-            <CardBody className="flex flex-col gap-4">
+            <CardBody className="flex flex-col gap-4 px-8 py-6">
               <form onSubmit={handleRegister}>
-                <Input
+                {/* Name Field */}
+                <div className="mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Name 
+                  </label>
+                  <Input
                   name="name"
                   type="text"
-                  label="Name"
                   size="lg"
-                  {...formik.getFieldProps("name")}
-                  className="mb-2"
-                />
-                {formik.touched.name && formik.errors.name && (
-                  <Typography variant="small" color="red">
-                    {formik.errors.name}
-                  </Typography>
-                )}
+                  placeholder="Enter your full name"
+                  // Remove the following Tailwind focus classes so only the custom class applies:
+                  // className="focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 input-teal-focus"
+                  // Instead, only use the custom class:
+                  className="input-teal-focus"
+                    {...formik.getFieldProps("name")}
+                  />
+                  {formik.touched.name && formik.errors.name && (
+                    <Typography variant="small" color="black" className="mt-1">
+                      {formik.errors.name+" !"}
+                    </Typography>
+                  )}
+                </div>
 
-                <Input
-                  name="email"
-                  type="email"
-                  label="Email"
-                  size="lg"
-                  {...formik.getFieldProps("email")}
-                  className="mt-4"
-                />
-                {formik.touched.email && formik.errors.email && (
-                  <Typography variant="small" color="red">
-                    {formik.errors.email}
-                  </Typography>
-                )}
+                {/* Email Field */}
+                <div className="mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Email 
+                  </label>
+                  <Input
+                    name="email"
+                    type="email"
+                    size="lg"
+                    placeholder="Enter your email"
+                     className="input-teal-focus"
+                    {...formik.getFieldProps("email")}
+                  />
+                  {formik.touched.email && formik.errors.email && (
+                    <Typography variant="small" color="black" className="mt-1">
+                      {formik.errors.email+" !"}
+                    </Typography>
+                  )}
+                </div>
 
-                <Input
-                  name="password"
-                  type="password"
-                  label="Password"
-                  size="lg"
-                  {...formik.getFieldProps("password")}
-                  className="mt-4"
-                />
-                {formik.touched.password && formik.errors.password && (
-                  <Typography variant="small" color="red">
-                    {formik.errors.password}
-                  </Typography>
-                )}
+                {/* Password Field */}
+                <div className="mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Password 
+                  </label>
+                  <Input
+                    name="password"
+                    type="password"
+                    size="lg"
+                    placeholder="Enter a strong password"
+                    className="input-teal-focus"
+ {...formik.getFieldProps("password")}
+                  />
+                  {formik.touched.password && formik.errors.password && (
+                    <Typography variant="small" color="black" className="mt-1">
+                      {formik.errors.password+" !"}
+                    </Typography>
+                  )}
+                </div>
 
                 {/* User Type Selection */}
-                <div className="mt-4 mb-2">
-                  <label className="text-sm font-semibold">Register As:</label>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1 ">
+                    Register As:
+                  </label>
                   <select
-                    className="w-full p-2 border border-gray-300 rounded mt-2"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-teal-400 focus:outline-none "
                     value={userType}
                     onChange={(e) => setUserType(e.target.value)}
                   >
                     <option value="student">Student</option>
                     <option value="advisor">Advisor</option>
+                    <option value="admin">Admin</option>
                   </select>
                 </div>
 
-                <Button variant="gradient" fullWidth type="submit" className="mt-4">
+                <Button
+                  variant="gradient"
+                  fullWidth
+                  type="submit"
+                  className="mt-2 bg-teal-600 hover:bg-teal-700 focus:bg-teal-700 shadow-md shadow-teal-300"
+                  color="teal"
+                >
                   Register as {userType}
                 </Button>
               </form>
             </CardBody>
-
-            <CardFooter className="pt-0">
-              <div className="mt-6 flex justify-center">
-                Already have an account?
+            <CardFooter className="pt-0 pb-6 flex flex-col items-center">
+              <div className="mt-2 flex items-center justify-center">
+                <Typography variant="small" className="text-gray-700">
+                  Already have an account?
+                </Typography>
                 <Link to="/login">
-                  <p className="ml-1 font-bold text-blue-500 text-center">
+                  <p className="ml-1 font-bold text-teal-600 hover:underline">
                     Login
                   </p>
                 </Link>

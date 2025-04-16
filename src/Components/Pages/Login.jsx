@@ -15,6 +15,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { AuthContext } from "../AppContext/AppContext";
 import { auth, onAuthStateChanged, db } from "../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -33,9 +34,11 @@ const Login = () => {
 
         // Navigate based on role
         if (userData?.role === "advisor") {
-          navigate("/advisor/dashboard");
+          navigate("/home");
+        } else if (userData?.role === "admin") {
+          navigate("/admin");
         } else {
-          navigate("/");
+          navigate("/home");
         }
         setLoading(false);
       } else {
@@ -50,7 +53,7 @@ const Login = () => {
     email: Yup.string().email("Invalid email address").required("Required"),
     password: Yup.string()
       .required("Required")
-      .min("6", "Must be at least 6 characters long"),
+      .min(6, "Must be at least 6 characters long"),
   });
 
   const handleSubmit = (e) => {
@@ -78,7 +81,7 @@ const Login = () => {
           <Card className="w-96">
             <CardHeader
               variant="gradient"
-              color="blue"
+              color="teal"
               className="mb-4 grid h-28 place-items-center"
             >
               <Typography variant="h3" color="white">
@@ -93,12 +96,13 @@ const Login = () => {
                     type="email"
                     label="Email"
                     size="lg"
+                     className="input-teal-focus"
                     {...formik.getFieldProps("email")}
                   />
                 </div>
                 {formik.touched.email && formik.errors.email && (
-                  <Typography variant="small" color="red">
-                    {formik.errors.email}
+                  <Typography variant="large" color="black">
+                    {formik.errors.email+"!"}
                   </Typography>
                 )}
 
@@ -108,11 +112,12 @@ const Login = () => {
                     type="password"
                     label="Password"
                     size="lg"
+                    className="input-teal-focus"
                     {...formik.getFieldProps("password")}
                   />
                   {formik.touched.password && formik.errors.password && (
-                    <Typography variant="small" color="red">
-                      {formik.errors.password}
+                    <Typography variant="large" color="black">
+                      {formik.errors.password+"!"}
                     </Typography>
                   )}
                 </div>
@@ -127,37 +132,40 @@ const Login = () => {
                   >
                     <option value="student">Student</option>
                     <option value="advisor">Advisor</option>
+                    <option value="admin">Admin</option>
                   </select>
                 </div>
 
-                <Button variant="gradient" fullWidth className="mb-4" type="submit">
+                <Button variant="gradient" fullWidth className="mb-4" type="submit" color="teal">
                   Login as {userType}
                 </Button>
               </form>
             </CardBody>
 
             <CardFooter className="pt-0">
-              <Button
-                variant="gradient"
-                fullWidth
-                className="mb-4"
-                onClick={signInWithGoogle}
-              >
-                Sign In with Google
-              </Button>
-              <Link to="/reset">
+            <Button
+      variant="gradient"
+      fullWidth
+      className="mb-4 flex items-center justify-center"
+      color="teal"
+      onClick={signInWithGoogle}
+    >
+      <FaGoogle className="text-white text-lg mr-2" />
+      Sign In with Google
+    </Button>
+              {/* <Link to="/reset">
                 <p className="ml-1 font-bold text-sm text-blue-500 text-center ">
                   Reset Password
                 </p>
-              </Link>
-              <div className="mt-6 flex items-center justify-center">
-                Don't have an account?
-                <Link to="/register">
-                  <p className="ml-1 font-bold text-sm text-blue-500 text-center ">
-                    Register
-                  </p>
-                </Link>
-              </div>
+              </Link> */}
+             <div className="mt-6 flex items-center justify-center text-gray-500">
+      <p className="text-base">
+        Don't have an account?
+        <Link to="/register"  className="ml-1 font-bold text-teal-600 hover:underline">
+          Register
+        </Link>
+      </p>
+    </div>
             </CardFooter>
           </Card>
         </div>

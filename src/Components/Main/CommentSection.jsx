@@ -18,7 +18,7 @@ import {
   postActions,
   postsStates,
 } from "../AppContext/PostReducer";
-import Comment from "./Comment_notYet";
+import Comment from "./Comment";
 
 const CommentSection = ({ postId }) => {
   const comment = useRef("");

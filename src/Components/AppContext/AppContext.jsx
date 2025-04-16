@@ -1,4 +1,4 @@
-// 3️⃣ AppContext.jsx Role Persistence Fix
+// src/AppContext/AppContext.jsx
 import React, { createContext, useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
@@ -15,7 +15,6 @@ import {
   collection,
   getDocs,
   addDoc,
-  onSnapshot,
   updateDoc,
   doc,
 } from "firebase/firestore";
@@ -26,27 +25,29 @@ export const AuthContext = createContext();
 const AppContext = ({ children }) => {
   const collectionUsersRef = collection(db, "users");
   const provider = new GoogleAuthProvider();
-  const [user, setUser] = useState();
-  const [userData, setUserData] = useState();
-
+  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
-
-  
 
   const signInWithGoogle = async () => {
     try {
       const popup = await signInWithPopup(auth, provider);
-      const user = popup.user;
-      const q = query(collectionUsersRef, where("uid", "==", user.uid));
+      const firebaseUser = popup.user;
+      const q = query(collectionUsersRef, where("uid", "==", firebaseUser.uid));
       const docs = await getDocs(q);
-      if (docs.docs.length === 0) {
+      
+      if (docs.empty) {
         await addDoc(collectionUsersRef, {
-          uid: user?.uid,
-          name: user?.displayName,
-          email: user?.email,
-          image: user?.photoURL,
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName || "Google User",
+          email: firebaseUser.email,
+          image: firebaseUser.photoURL || "",
           authProvider: popup?.providerId,
           role: "student",
+          createdAt: new Date(),
+          phone: "",
+          about: "",
+          isJoined: false, // 👈 مهم جداً
         });
       }
     } catch (err) {
@@ -57,15 +58,16 @@ const AppContext = ({ children }) => {
   const loginWithEmailAndPassword = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const q = query(collectionUsersRef, where("uid", "==", user.uid));
+      const firebaseUser = userCredential.user;
+      const q = query(collectionUsersRef, where("uid", "==", firebaseUser.uid));
       const docs = await getDocs(q);
+      
       if (!docs.empty) {
-        const userData = docs.docs[0].data();
-        if (userData.role === "advisor") {
-          navigate("/advisor/dashboard");
+        const data = docs.docs[0].data();
+        if (data.role === "admin") {
+          navigate("/admin/dashboard");
         } else {
-          navigate("/");
+          navigate("/home");
         }
       }
     } catch (err) {
@@ -76,27 +78,37 @@ const AppContext = ({ children }) => {
   const registerWithEmailAndPassword = async (name, email, password, role = "student") => {
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      const user = res.user;
-      await addDoc(collection(db, "users"), {
-        uid: user.uid,
-        name,
+      const firebaseUser = res.user;
+      
+      if (!name?.trim()) throw new Error("Name is required");
+      
+      await addDoc(collectionUsersRef, {
+        name: name.trim(), 
+        uid: firebaseUser.uid,
         email,
         role: role,
         createdAt: new Date(),
+        image: "",
+        phone: "",
+        about: "",
+        isJoined: false, // 👈 مهم جداً
       });
+      
       alert(`${role} registered successfully!`);
-      if (role === "advisor") {
-        navigate("/advisor/dashboard");
+      if (role === "admin") {
+        navigate("/admin/dashboard");
       } else {
-        navigate("/");
+        navigate("/home");
       }
     } catch (err) {
       alert("Error during registration: " + err.message);
     }
   };
+
   const signOutUser = async () => {
     await signOut(auth);
   };
+
   const updateProfile = async (updatedData) => {
     if (!user?.uid) return;
   
@@ -106,35 +118,57 @@ const AppContext = ({ children }) => {
   
       if (!querySnapshot.empty) {
         const userDoc = querySnapshot.docs[0];
-        await updateDoc(doc(db, "users", userDoc.id), updatedData);
-        setUserData((prev) => ({ ...prev, ...updatedData })); // Update React State
+        const currentData = userDoc.data();
+        const completeUpdate = {
+          ...currentData,
+          ...updatedData
+        };
+        await updateDoc(doc(db, "users", userDoc.id), completeUpdate);
+        setUserData((prev) => ({ ...prev, ...completeUpdate }));
       }
     } catch (error) {
       console.error("Error updating profile:", error);
+      alert("Failed to update profile");
     }
   };
-  
 
-  const userStateChanged = async () => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const q = query(collectionUsersRef, where("uid", "==", user?.uid));
+  const userStateChanged = () => {
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const q = query(collectionUsersRef, where("uid", "==", firebaseUser.uid));
         const snapshot = await getDocs(q);
+        
         if (!snapshot.empty) {
-          const userData = snapshot.docs[0].data();
-          setUserData(userData);  // ✅ Always set correct role
-          setUser(user);
+          const userDoc = snapshot.docs[0];
+          const data = userDoc.data();
+
+          console.log("✅ User from Firestore:", data); // 👈 يعرض isJoined
+
+          setUserData(data); // يحتوي على isJoined وغيره
+          setUser(firebaseUser);
+
+          if (data.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/home");
+          }
         } else {
           const defaultData = {
-            uid: user.uid,
-            name: user.displayName || "Unknown",
-            email: user.email,
-            role: "student",  // ✅ Default to student
+            uid: firebaseUser.uid,
+            name: firebaseUser.displayName || "New User",
+            email: firebaseUser.email,
+            image: firebaseUser.photoURL || "",
+            role: "student",
             createdAt: new Date(),
+            phone: "",
+            about: "",
+            isJoined: false, // 👈 افتراضيًا
           };
+          
           await addDoc(collectionUsersRef, defaultData);
           setUserData(defaultData);
-          setUser(user);
+          setUser(firebaseUser);
+          navigate("/home");
         }
       } else {
         setUser(null);
@@ -143,7 +177,6 @@ const AppContext = ({ children }) => {
       }
     });
   };
-  
 
   useEffect(() => {
     userStateChanged();
@@ -154,13 +187,30 @@ const AppContext = ({ children }) => {
     loginWithEmailAndPassword,
     registerWithEmailAndPassword,
     user,
-    userData,
+    userData: userData || {
+      name: "",
+      email: "",
+      role: "",
+      image: "",
+      phone: "",
+      about: "",
+      isJoined: false, // 👈 تأكيد
+    },
     signOutUser,
     updateProfile,
+    getCurrentUser: () => ({
+      uid: user?.uid,
+      name: userData?.name,
+      email: userData?.email,
+      role: userData?.role,
+      image: userData?.image
+    })
   };
 
   return (
-    <AuthContext.Provider value={initialState}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={initialState}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 

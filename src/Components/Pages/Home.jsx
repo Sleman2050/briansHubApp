@@ -8,26 +8,24 @@ import Dashboard from "./Student/Dashboard";
 
 const Home = () => {
   return (
-    <div className="w-full g-gray-100">
+    <div className="w-full bg-gray-100">
       <div className="fixed top-0 z-10 w-full bg-white">
         <Navbar></Navbar>
+        <RightSide></RightSide>
       </div>
-      <div className="flex bg-gray-100">
-        <div className="flex-auto w-[20%] fixed top-12">
-          <LeftSide></LeftSide>
-        </div>
-        <div className="flex-auto w-[60%] absolute left-[20%] top-14 bg-gray-100 rounded-xl">
-          <div className="w-[80%] mx-auto">
-            <Dashboard></Dashboard>
+      <br />
+      <div className="w-[100%] mx-auto ">
+          
             <Main></Main>
           </div>
-        </div>
-        <div className="flex-auto w-[20%] fixed right-0 top-12 bg-gray-100">
-          <RightSide></RightSide>
-        </div>
-      </div>
+      
+       
+ 
     </div>
   );
 };
 
 export default Home;
+
+
+

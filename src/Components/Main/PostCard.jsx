@@ -24,7 +24,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
-import CommentSection from "./CommentSection_notYet";
+import CommentSection from "./CommentSection";
 
 const PostCard = ({ uid, id, logo, name, email, text, media, timestamp }) => {
   const { user } = useContext(AuthContext);
@@ -72,57 +72,73 @@ const PostCard = ({ uid, id, logo, name, email, text, media, timestamp }) => {
   };
 
   return (
-    <div className="mb-4">
-      <div className="flex flex-col py-4 bg-white rounded-t-3xl">
-        <div className="flex justify-start items-center pb-4 pl-4">
-          <Avatar size="sm" variant="circular" src={logo || avatar} alt="avatar" />
-          <div className="flex flex-col ml-4">
-            <p className="py-2 font-roboto font-medium text-sm text-gray-700">{email}</p>
-            <p className="font-roboto font-medium text-sm text-gray-700">Published: {timestamp}</p>
-          </div>
-        </div>
-        <div>
-          <p className="mr-4 pb-4 font-roboto font-large text-xl text--700">{text}</p>
-          {Array.isArray(media) && media.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
-              {media.map((file, index) => (
-                <div key={index} className="flex justify-center items-center">
-                  {file.type && file.url ? (
-                    file.type.startsWith("video/") ? (
-                      <video controls src={file.url} className="w-full rounded-lg shadow-lg" />
-                    ) : file.type.startsWith("image/") ? (
-                      <img
-                        src={file.url}
-                        alt="Uploaded"
-                        className="w-full rounded-lg shadow-lg cursor-pointer"
-                        onClick={() => setSelectedImage(file.url)}
-                      />
-                    ) : file.type.startsWith("application/pdf") || file.type.includes("msword") || file.type.includes("officedocument") ? (
-                      <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                        View Document
-                      </a>
-                    ) : (
-                      <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                        Download File
-                      </a>
-                    )
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm text-center">No media attached</p>
-          )}
+    
+    <div className="mb-6 max-w-3xl mx-auto bg-white shadow-md rounded-xl border border-customCyan overflow-hidden">
+      <div className="flex items-center p-4 border-b ">
+        <Avatar size="md" variant="circular" src={logo || avatar} alt="avatar" />
+        <div className="ml-4">
+          <p className="text-sm font-semibold text-gray-800">{email}</p>
+          <p className="text-xs text-gray-500">Published: {timestamp}</p>
         </div>
       </div>
+  
+      <div className="px-6 py-4 ">
+        <p className="text-gray-800 text-base mb-4">{text}</p>
+  
+        {Array.isArray(media) && media.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            {media.map((file, index) => (
+              <div key={index} className="flex justify-center">
+                {file.type && file.url ? (
+                  file.type.startsWith("video/") ? (
+                    <video controls src={file.url} className="rounded-lg shadow max-h-64" />
+                  ) : file.type.startsWith("image/") ? (
+                    <img
+                      src={file.url}
+                      alt="Uploaded"
+                      className="rounded-lg shadow max-h-64 cursor-pointer"
+                      onClick={() => setSelectedImage(file.url)}
+                    />
+                  ) : file.type.includes("pdf") || file.type.includes("msword") || file.type.includes("officedocument") ? (
+                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      View Document
+                    </a>
+                  ) : (
+                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      Download File
+                    </a>
+                  )
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400 text-sm text-center">No media attached</p>
+        )}
+      </div>
+  
+      <div className="px-6 pb-4 flex justify-between items-center border-t">
+  <button
+    onClick={() => setOpen(!open)}
+    className="text-sm text-cyan-700 hover:underline font-medium"
+  >
+    {open ? "Hide Comments" : "View Comments"}
+  </button>
+</div>
+
+
+
       {open && <CommentSection postId={id} />}
+  
       {selectedImage && (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-80 z-50" onClick={() => setSelectedImage(null)}>
           <img src={selectedImage} alt="Full View" className="max-w-3xl max-h-screen rounded-lg shadow-lg" />
         </div>
       )}
     </div>
+
   );
+  
 };
 
 export default PostCard;

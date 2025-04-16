@@ -77,3 +77,9 @@
     background: #e0e0e0;
   }
   
+/* In your custom.css file */
+input.input-teal-focus:focus {
+  outline: none !important;
+  border-color: #14b8a6 !important; /* Your teal color (Tailwind teal-500) */
+  box-shadow: none !important;      /* Remove any default box-shadow */
+}

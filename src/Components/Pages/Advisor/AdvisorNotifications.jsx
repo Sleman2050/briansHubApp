@@ -41,7 +41,7 @@ const AdvisorNotifications = () => {
         onChange={(e) => setSelectedGroup(e.target.value)}
         className="w-full mb-4 p-2 border border-gray-300 rounded"
       >
-        <option value="">Select a group</option>
+        <option value="" >Select a group</option>
         {groups.map((group) => (
           <option key={group.id} value={group.id}>
             {group.groupName}
@@ -57,7 +57,7 @@ const AdvisorNotifications = () => {
       />
       <button
         onClick={sendNotification}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600"
       >
         🚀 Send Notification
       </button>

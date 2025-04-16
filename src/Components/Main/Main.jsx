@@ -100,88 +100,152 @@ const Main = () => {
   };
 
   return (
-    <div className="flex flex-col items-center px-6 py-8 w-full bg-gray-50 min-h-screen">
-      {/* Post Input Section */}
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <div className="flex items-center border-b border-gray-300 pb-4">
-          <Avatar
-            size="lg"
-            variant="circular"
-            src={user?.photoURL || userData?.image || "https://via.placeholder.com/50"}
-            alt="avatar"
-            className="shadow-md border-2 border-gray-400"
-          />
-          <form className="w-full flex items-center bg-gray-100 p-3 rounded-xl shadow-inner mx-4" onSubmit={handleSubmitPost}>
-            <div className="flex w-full items-center bg-white p-2 rounded-lg border border-gray-300">
-              <input
-                type="text"
-                name="text"
-                placeholder={`What's on your mind, ${user?.displayName || userData?.name}?`}
-                className="outline-none w-full bg-transparent p-2 text-gray-700 placeholder-gray-500"
-                ref={text}
-              />
-              <Button variant="gradient" color="green" className="ml-3 px-6 py-2 text-white rounded-lg shadow-md" type="submit">
-                Share
-              </Button>
-            </div>
-          </form>
-        </div>
-        {/* Upload Section */}
-        <div className="flex justify-between items-center px-6 py-4 bg-gray-50 shadow-md rounded-b-xl mt-2">
-          <label htmlFor="fileUpload" className="cursor-pointer flex items-center text-green-600 hover:text-green-800 transition-all">
-            <FiUploadCloud className="w-6 h-6 mr-2" />
-            <span className="text-sm font-semibold">Upload File</span>
-          </label>
-          <input id="fileUpload" type="file" className="hidden" multiple accept="image/*, video/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleUpload} />
-        </div>
-        {/* Selected Files Preview */}
-        {selectedFiles.length > 0 && (
-          <div className="px-6 py-2 text-gray-700 text-sm">
-            <strong>Selected Files:</strong>
-            <ul className="mt-2">
-              {selectedFiles.map((file, index) => (
-                <li key={index} className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg shadow-sm mt-2">
-                  <span>{file.name}</span>
-                  <FiXCircle className="text-red-500 cursor-pointer hover:text-red-700" onClick={() => handleRemoveFile(file.name)} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+<div className="flex flex-col items-center px-6 py-6 w-[100%] mx-auto bg-gray-100 min-h-screen">
 
-      {/* Posts Section */}
-      <div className="flex flex-col py-4 w-full max-w-2xl">
-        {state?.error ? (
-          <div className="flex justify-center items-center">
-            <Alert color="red">Something went wrong. Refresh and try again...</Alert>
-          </div>
-        ) : (
-          <div>
-            {state?.posts?.length > 0 ? (
-              state?.posts?.map((post, index) => (
-                <PostCard
-                  key={index}
-                  logo={post?.logo}
-                  id={post?.documentId}
-                  uid={post?.uid}
-                  name={post?.name}
-                  email={post?.email}
-                  media={post?.media}
-                  text={post?.text}
-                  timestamp={new Date(post?.timestamp?.toDate()).toUTCString()}
-                />
-              ))
-            ) : (
-              <p className="text-gray-600 text-center">No posts yet. Be the first to share something!</p>
-            )}
-          </div>
-        )}
-      </div>
 
-      <div ref={scrollRef}></div>
+<div className="w-[90%] max-w-3xl bg-gray-100 pt-10 rounded-xl  mx-auto flex flex-col space-y-0 mt-4">
+  {/* Post Input Section */}
+
+  
+  <form
+  onSubmit={handleSubmitPost}
+  className="bg-white shadow-lg rounded-xl p-4 mb-6 w-full max-w-4xl mx-auto"
+>
+  <div className="flex items-start gap-4">
+    <img
+      src={userData?.image}
+      alt="avatar"
+      className="w-12 h-12 rounded-full object-cover"
+    />
+
+    <div className="flex-1">
+     
+    <div className="flex items-center gap-2 bg-gray-200 p-3 rounded-lg shadow-inner">
+  <input
+    type="text"
+    name="text"
+    placeholder={`What's on your mind, ${user?.displayName || userData?.name}?`}
+    className="flex-1 bg-transparent outline-none text-gray-1000 placeholder-gray-700"
+    ref={text}
+  />
+  <label htmlFor="fileUpload" className="cursor-pointer">
+    <FiUploadCloud className="text-[#23B0A5] w-6 h-6 hover:text-customCyan" />
+  </label>
+  <input
+    id="fileUpload"
+    type="file"
+    className="hidden"
+    multiple
+    accept="image/*, video/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    onChange={handleUpload}
+  />
+  <button
+    type="submit"
+    className="bg-[#23B0A5] hover:bg-[#1f9e96] text-white text-md px-4 py-1 rounded-md font-medium"
+  >
+    Share
+  </button>
+</div>
+
+
+      {/* Optional: Selected File Names */}
+      {selectedFiles.length > 0 && (
+        <div className="text-sm text-gray-600 mt-2 space-y-1">
+          <strong>Attached:</strong>
+          <ul className="pl-4 list-disc">
+            {selectedFiles.map((file, index) => (
+              <li key={index}>{file.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
+  </div>
+</form>
+
+
+
+
+  {/* Selected Files Preview */}
+  {selectedFiles.length > 0 && (
+    <div className="px-6 py-2 text-gray-700 text-sm">
+      <strong>Selected Files:</strong>
+      <ul className="mt-2">
+        {selectedFiles.map((file, index) => (
+          <li key={index} className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg shadow-sm mt-2">
+            <span>{file.name}</span>
+            <FiXCircle className="text-red-500 cursor-pointer hover:text-red-700" onClick={() => handleRemoveFile(file.name)} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+
+<br />
+{/* Posts Section */}
+<div className="flex flex-col py-6 w-full max-w-4xl bg-gray-100 rounded-lg shadow-[0_2px_8px_rgba(9,124,124,0.1)]">
+  {state?.error ? (
+    <div className="flex justify-center items-center px-4 mb-6 ">
+      <Alert color="red" className="border-l-4 border-red-500 bg-red-50 text-red-700 p-4 rounded">
+        Something went wrong. Refresh and try again...
+      </Alert>
+    </div>
+  ) : (
+    <div className="space-y-6 px-4 ">
+      {state?.posts?.length > 0 ? (
+        state?.posts?.map((post, index) => (
+          <PostCard
+            key={index}
+            className="border-l-4 border-[#097C7C] hover:border-opacity-80 transition-all "
+            logo={post?.logo}
+            id={post?.documentId}
+            uid={post?.uid}
+            name={post?.name}
+            email={post?.email}
+            media={post?.media}
+            text={post?.text}
+            timestamp={new Date(post?.timestamp?.toDate()).toUTCString()}
+          />
+        ))
+      ) : (
+        <div className="flex flex-col items-center py-12 space-y-4  ">
+          <div className="text-[#097C7C]">
+            {/* Choose one of these alternatives */}
+            {/* Text-based icon */}
+            <span className="text-4xl font-bold">!</span>
+            
+            {/* Or SVG icon */}
+            {/* <svg 
+              className="h-12 w-12" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+              />
+            </svg> */}
+          </div>
+          <p className="text-xl font-semibold text-[#097C7C] text-center">
+            No posts yet. Be the first to share something!
+          </p>
+          <p className="text-gray-600 text-sm">Your post could start the conversation</p>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+<div ref={scrollRef} className="h-8 bg-gradient-to-t from-[#097C7C]/10 to-transparent "></div>
+</div>
+
   );
+
 };
 
 export default Main;
