@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.599d1f44.css",
-    "main.js": "/static/js/main.70beb399.js",
-    "static/media/avatar.jpg": "/static/media/avatar.915a8b098e3e76a13994.jpg",
-    "static/media/profilePic.jpg": "/static/media/profilePic.decc0f2e25cb5739baf5.jpg",
-    "static/media/brainsHubLogo.png": "/static/media/brainsHubLogo.79d55dd1d9550bde125a.png",
-    "index.html": "/index.html",
-    "main.599d1f44.css.map": "/static/css/main.599d1f44.css.map",
-    "main.70beb399.js.map": "/static/js/main.70beb399.js.map"
+    "main.css": "/briansHubApp/static/css/main.599d1f44.css",
+    "main.js": "/briansHubApp/static/js/main.8a506c32.js",
+    "static/media/avatar.jpg": "/briansHubApp/static/media/avatar.915a8b098e3e76a13994.jpg",
+    "static/media/profilePic.jpg": "/briansHubApp/static/media/profilePic.decc0f2e25cb5739baf5.jpg",
+    "static/media/brainsHubLogo.png": "/briansHubApp/static/media/brainsHubLogo.79d55dd1d9550bde125a.png",
+    "index.html": "/briansHubApp/index.html",
+    "main.599d1f44.css.map": "/briansHubApp/static/css/main.599d1f44.css.map",
+    "main.8a506c32.js.map": "/briansHubApp/static/js/main.8a506c32.js.map"
   },
   "entrypoints": [
     "static/css/main.599d1f44.css",
-    "static/js/main.70beb399.js"
+    "static/js/main.8a506c32.js"
   ]
 }
