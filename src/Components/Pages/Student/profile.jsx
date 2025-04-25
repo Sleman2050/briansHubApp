@@ -49,7 +49,6 @@ const Profile = () => {
   const [currentUserIsJoined, setCurrentUserIsJoined] = useState(false);
 
   // NEW: Track if either user is already in a group using the isJoined field.
-  // نتوقع أن يحتوي userData والملف الشخصي على قيمة isJoined.
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -313,19 +312,21 @@ const Profile = () => {
                 className="bg-gray-100"
               />
             </div>
-
-            {/* Technical Skills */}
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Technical Skills</p>
-              <Input
-                name="skills"
-                value={formData.skills}
-                onChange={handleChange}
-                disabled={!isEditingProfile}
-                className="bg-gray-100"
-              />
-            </div>
           </div>
+
+                      {/* Conditionally render technical skills only for students */}
+                      {profile?.role === "student" && (
+            <div>
+            <p className="text-sm font-medium text-gray-600 mb-1">Technical Skills</p>
+            <Input
+              name="skills"
+              value={formData.skills}
+              onChange={handleChange}
+              disabled={!isEditingProfile}
+              className="bg-gray-100"
+            />
+          </div>
+            )}
 
           {/* Social Media Links */}
           {profile?.urls?.length > 0 && (
@@ -413,7 +414,10 @@ const Profile = () => {
                 />
               </div>
             </>
+            
           )}
+
+
 
           {/* Action Buttons */}
           <div className="mt-4 flex gap-4 flex-wrap">
