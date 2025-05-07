@@ -26,9 +26,13 @@ const AdvisorDashboard = () => {
       const advisorDocId = advisorSnap.docs[0].id;
 
       const allGroupsSnap = await getDocs(collection(db, "groups"));
-      const advisorGroups = allGroupsSnap.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((g) => g.advisor?.id === advisorDocId);
+      // Iterating through all groups document and create a new array object contains all the DOCUMENTS
+      const Allgroups = allGroupsSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      // Filtering the groups we accessed to come with the groups that contains the advisorID.
+      const advisorGroups = Allgroups.filter((group) => group.advisor?.id === advisorDocId);
 
       setGroups(advisorGroups);
     };
@@ -52,14 +56,14 @@ const AdvisorDashboard = () => {
             <Card key={group.id} className="p-6 shadow-lg border border-gray-300 rounded">
               <div className="flex justify-between items-center mb-4">
                 <Typography variant="h5" className="text-blue-600">
-                  Group ID: {group.id}
+                  Group Name: {group.name}
                 </Typography>
                 <Typography variant="small" color="gray">
-                  Members: {group.members?.length || 0}
+                  Members: {group.members?.length}
                 </Typography>
               </div>
 
-              {/* Members */}
+              
               <div className="mb-4">
                 <Typography variant="small" className="font-medium">Members:</Typography>
                 <div className="flex flex-wrap gap-4 mt-2">
